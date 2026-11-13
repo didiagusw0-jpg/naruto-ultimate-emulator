@@ -41,17 +41,13 @@ jobs:
         run: |
           python3 - <<'PY'
           from pathlib import Path
-          for rel in ("src/main/res/values/strings.xml", "src/main/res/values-id/strings.xml"):
-              p = Path(rel)
-              s = p.read_text(encoding="utf-8")
-              marker = "<resources>"
-              if 'name="app_name"' in s:
-                  import re
-                  s = re.sub(r'<string name="app_name">.*?</string>', '<string name="app_name">Naruto Shippuden: Ultimate Ninja 5</string>', s, count=1)
-              else:
-                  s = s.replace(marker, marker + '\n    <string name="app_name">Naruto Shippuden: Ultimate Ninja 5</string>', 1)
-              s = s.replace("Play! PlayStation 2 Emulator", "Naruto Shippuden: Ultimate Ninja 5")
-              p.write_text(s, encoding="utf-8")
+          import re
+          p = Path("src/main/res/values/donottranslate.xml")
+          s = p.read_text(encoding="utf-8")
+          s, count = re.subn(r'<string name="app_name">.*?</string>', '<string name="app_name">Naruto Shippuden: Ultimate Ninja 5</string>', s, count=1, flags=re.S)
+          if count != 1:
+              raise SystemExit("Could not find app_name in donottranslate.xml")
+          p.write_text(s, encoding="utf-8")
           PY
 
       - name: Build installable debug APK
