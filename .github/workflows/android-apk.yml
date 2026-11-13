@@ -36,16 +36,34 @@ jobs:
           yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses
           "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "ndk;29.0.14206865" "cmake;3.31.1"
 
-      - name: Build release APK
+      - name: Apply Naruto app branding
+        working-directory: Play/build_android
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          for rel in ("src/main/res/values/strings.xml", "src/main/res/values-id/strings.xml"):
+              p = Path(rel)
+              s = p.read_text(encoding="utf-8")
+              marker = "<resources>"
+              if 'name="app_name"' in s:
+                  import re
+                  s = re.sub(r'<string name="app_name">.*?</string>', '<string name="app_name">Naruto Shippuden: Ultimate Ninja 5</string>', s, count=1)
+              else:
+                  s = s.replace(marker, marker + '\\n    <string name="app_name">Naruto Shippuden: Ultimate Ninja 5</string>', 1)
+              s = s.replace("Play! PlayStation 2 Emulator", "Naruto Shippuden: Ultimate Ninja 5")
+              p.write_text(s, encoding="utf-8")
+          PY
+
+      - name: Build installable debug APK
         working-directory: Play/build_android
         run: |
           chmod +x ./gradlew
-          ./gradlew --no-daemon assembleRelease
+          ./gradlew --no-daemon assembleDebug
 
-      - name: Upload unsigned APK
+      - name: Upload installable APK
         uses: actions/upload-artifact@v4
         with:
-          name: Naruto-Ultimate-Emulator-PS2-Edition-unsigned
-          path: Play/build_android/build/outputs/apk/release/*-release-unsigned.apk
+          name: Naruto-Shippuden-Ultimate-Ninja-5-debug
+          path: Play/build_android/build/outputs/apk/debug/*-debug.apk
           if-no-files-found: error
           retention-days: 14
