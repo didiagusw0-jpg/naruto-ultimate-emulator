@@ -49,7 +49,7 @@ jobs:
                   import re
                   s = re.sub(r'<string name="app_name">.*?</string>', '<string name="app_name">Naruto Shippuden: Ultimate Ninja 5</string>', s, count=1)
               else:
-                  s = s.replace(marker, marker + '\\n    <string name="app_name">Naruto Shippuden: Ultimate Ninja 5</string>', 1)
+                  s = s.replace(marker, marker + '\n    <string name="app_name">Naruto Shippuden: Ultimate Ninja 5</string>', 1)
               s = s.replace("Play! PlayStation 2 Emulator", "Naruto Shippuden: Ultimate Ninja 5")
               p.write_text(s, encoding="utf-8")
           PY
